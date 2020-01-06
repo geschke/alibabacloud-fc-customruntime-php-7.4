@@ -1,0 +1,40 @@
+ROSTemplateFormatVersion: '2015-09-01'
+Transform: 'Aliyun::Serverless-2018-04-03'
+Resources:
+  customphptest:
+    Type: 'Aliyun::Serverless::Service'
+    Properties:
+      Description: 'helloworld'
+      # LogConfig: # opyional
+      #   Project: 'auto-op-demo-pro'
+      #   Logstore: 'fc-log'
+      NasConfig: Auto
+      #NasConfig:
+      #  Auto: true
+      #  UserId: 33
+      #  GroupId: 33
+    customphpfirst:
+      Type: 'Aliyun::Serverless::Function'
+      Properties:
+        Handler: index.handler
+        Runtime: custom
+        CodeUri: './'
+        MemorySize: 512
+        Timeout: 300
+        InstanceConcurrency: 20
+      Events:
+        httpTrigger:
+          Type: HTTP
+          Properties:
+            AuthType: ANONYMOUS
+            Methods: [ 'HEAD', 'POST', 'PUT', 'GET', 'DELETE']
+
+  fc.geschke.net:
+    Type: 'Aliyun::Serverless::CustomDomain'
+    Properties:
+      Protocol: HTTP
+      RouteConfig:
+        Routes:
+          '/*':
+            ServiceName: customphptest
+            FunctionName: customphpfirst
